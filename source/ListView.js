@@ -28,14 +28,19 @@ export default class ListView extends Phaser.GameObjects.Container {
         this.scene.input.on('drag', (pointer, target, x, y) => {
             if (target !== this) return;
 
+            const {
+                height
+            } = this.getBounds();
             const min = this.y;
-            const max = this.y + this.height - this.scrollBar.displayHeight;
-            const val = Phaser.Math.Clamp(this.scrollPos - (y - this.y), min, max);
-            const scrollPerc = Phaser.Math.Clamp((val - min) / (max - min), 0, 1);
-            const barScroll = this.height - this.scrollBar.displayHeight;
+            const max = this.y + height - this.camera.height;
+            const clampedValue = Phaser.Math.Clamp(this.scrollPos - (y - this.y), min, max);
+            const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
 
-            this.scrollBar.setY(barScroll * scrollPerc + this.y);
-            this.camera.setScroll(0, val);
+            const barScroll = (this.height - this.scrollBar.displayHeight) * scrollPerc + this.y;
+            const cameraScroll = clampedValue;
+
+            this.scrollBar.setY(barScroll);
+            this.camera.setScroll(0, cameraScroll);
         });
 
         this.scene.make.graphics({ x: 0, y: 0, add: false })
@@ -56,12 +61,14 @@ export default class ListView extends Phaser.GameObjects.Container {
             } = this.getBounds();
             const min = this.y;
             const max = this.y + this.height - this.scrollBar.displayHeight;
-            const val = Phaser.Math.Clamp(y, this.y, this.y + this.height - this.scrollBar.displayHeight);
-            const scrollPerc = Phaser.Math.Clamp((val - min) / (max - min), 0, 1);
-            const cameraScroll = height - this.camera.height;
+            const clampedValue = Phaser.Math.Clamp(y, this.y, this.y + this.height - this.scrollBar.displayHeight);
+            const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
 
-            this.scrollBar.setY(val);
-            this.camera.setScroll(0, cameraScroll * scrollPerc + this.y);
+            const barScroll = clampedValue;
+            const cameraScroll = (height - this.camera.height)  * scrollPerc + this.y;
+
+            this.scrollBar.setY(barScroll);
+            this.camera.setScroll(0, cameraScroll);
         });
 
         this.createBackground();
