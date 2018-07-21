@@ -25,12 +25,45 @@ export default class ListView extends Phaser.GameObjects.Container {
         this.camera = this.scene.cameras.add(this.x + padding, this.y + padding, this.width - padding * 2, this.height - padding * 2);
 
         this.scrollPos = 0;
-        this.scene.input.on('dragstart', (pointer, target) =>
-            target === this && (this.scrollPos = this.camera.scrollY)
-        );
-        this.scene.input.on('drag', (pointer, target, x, y) =>
-            target === this && this.camera.setScroll(0, this.scrollPos - (y - this.y))
-        );
+        this.scene.input.on('dragstart', (pointer, target) => target === this && (this.scrollPos = this.camera.scrollY));
+        this.scene.input.on('drag', (pointer, target, x, y) => {
+            if (target !== this) return;
+
+            const min = this.y;
+            const max = this.y + this.height - this.scrollBar.displayHeight + 20;
+            const val = Phaser.Math.Clamp(this.scrollPos - (y - this.y), min, max);
+            const scrollPerc = Phaser.Math.Clamp((val - min) / (max - min), 0, 1);
+            const barScroll = this.height - this.scrollBar.displayHeight;
+
+            this.scrollBar.setY(barScroll * scrollPerc + this.y);
+            this.camera.setScroll(0, val);
+        });
+
+        this.scene.make.graphics({ x: 0, y: 0, add: false })
+            .fillStyle(0xff0000, 1)
+            .fillRect(0, 0, 50, 10)
+            .generateTexture('scroll', 1, 1);
+        this.scrollBar = this.scene.add.sprite(0, 0, 'scroll')
+            .setOrigin(0, 0)
+            .setPosition(x + width, y)
+            .setInteractive({
+                useHandCursor: true
+            });
+        this.scene.input.setDraggable(this.scrollBar);
+
+        this.scrollBar.on('drag', (pointer, x, y) => {
+            const {
+                height
+            } = this.getBounds();
+            const min = this.y;
+            const max = this.y + this.height - this.scrollBar.displayHeight;
+            const val = Phaser.Math.Clamp(y, this.y, this.y + this.height - this.scrollBar.displayHeight);
+            const scrollPerc = Phaser.Math.Clamp((val - min) / (max - min), 0, 1);
+            const cameraScroll = height - this.camera.height;
+
+            this.scrollBar.setY(val);
+            this.camera.setScroll(0, cameraScroll * scrollPerc + this.y);
+        });
 
         this.createBackground();
     }
@@ -49,6 +82,15 @@ export default class ListView extends Phaser.GameObjects.Container {
             .forEach(child => this.camera.ignore(child));
 
         return this.update(...args);
+    }
+
+    update() {
+        const {
+            height
+        } = this.getBounds();
+        const percHeight = Phaser.Math.Clamp(this.camera.height / height, 0.1, 1);
+
+        this.scrollBar.setDisplaySize(10, percHeight * this.height);
     }
 
     add (items = []) {
