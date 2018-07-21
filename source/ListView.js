@@ -1,4 +1,4 @@
-export default class UIPane extends Phaser.GameObjects.Container {
+export default class ListView extends Phaser.GameObjects.Container {
 
     constructor ({
         context,
