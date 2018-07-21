@@ -22,10 +22,13 @@ new Phaser.Game({
 });
 ```
 
-## Usage
-The plugin registers a new custom Game Object that is available from within your scenes:
+## Components
+The plugin registers the following custom Game Objects that are available from within your scenes:
+
+### ListView
+#### Example
 ```js
-this.add.window(100, 100, 500, 500);
+this.add.listview(100, 100, 500, 500);
 ```
 
 ## TODO
