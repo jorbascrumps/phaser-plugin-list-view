@@ -1,5 +1,5 @@
 # Phaser Window Manager
-_Note: Phaser Window Manager is currently in a prelrelease state and is therefore subject to frequent (sometimes undocumented) breaking changes._
+_Note: Phaser Window Manager is currently in a prerelease state and is therefore subject to frequent (sometimes undocumented) breaking changes._
 
 ## Installation
 ```
