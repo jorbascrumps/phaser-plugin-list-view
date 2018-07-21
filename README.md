@@ -25,11 +25,16 @@ new Phaser.Game({
 ## Components
 The plugin registers the following custom Game Objects that are available from within your scenes:
 
-### ListView
-#### Example
+### `ListView`
+#### Example Usage
 ```js
 this.add.listview(100, 100, 500, 500);
 ```
+#### `ListView.add(child)`
+##### Arguments
+* **child** (GameObject|GameObject[]) &mdash; The child to add to the bottom of the list
+
+**Returns** a `ListView` object.
 
 ## TODO
 - [ ] Additional documentation
