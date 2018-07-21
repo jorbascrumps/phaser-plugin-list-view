@@ -6,7 +6,6 @@ export default class ListView extends Phaser.GameObjects.Container {
         width = 100,
         x = 0,
         y = 0,
-        padding = 10,
         background = 0x009688
     } = {}) {
         super(context, x, y);
@@ -22,7 +21,7 @@ export default class ListView extends Phaser.GameObjects.Container {
         });
 
         this.backgroundColour = background;
-        this.camera = this.scene.cameras.add(this.x + padding, this.y + padding, this.width - padding * 2, this.height - padding * 2);
+        this.camera = this.scene.cameras.add(this.x, this.y, this.width, this.height);
 
         this.scrollPos = 0;
         this.scene.input.on('dragstart', (pointer, target) => target === this && (this.scrollPos = this.camera.scrollY));
@@ -30,7 +29,7 @@ export default class ListView extends Phaser.GameObjects.Container {
             if (target !== this) return;
 
             const min = this.y;
-            const max = this.y + this.height - this.scrollBar.displayHeight + 20;
+            const max = this.y + this.height - this.scrollBar.displayHeight;
             const val = Phaser.Math.Clamp(this.scrollPos - (y - this.y), min, max);
             const scrollPerc = Phaser.Math.Clamp((val - min) / (max - min), 0, 1);
             const barScroll = this.height - this.scrollBar.displayHeight;
@@ -100,7 +99,7 @@ export default class ListView extends Phaser.GameObjects.Container {
                     height
                 } = this.getBounds();
                 const x = 0;
-                const y = height > 0 ? height + 10 : 0;
+                const y = height;
 
                 item
                     .setPosition(x, y)
