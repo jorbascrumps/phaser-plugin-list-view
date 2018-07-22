@@ -31,8 +31,17 @@ this.add.listview(100, 100, 500, 500);
 ## API
 
 ### `ListView.add(child)`
-##### Arguments
+#### Arguments
 * **child** (GameObject|GameObject[]) &mdash; The child to add to the bottom of the list
+
+**Returns** a `ListView` object.
+
+### `ListView.setScrollbarEnable(config)`
+#### Arguments
+* **config** (Boolean|Object) &mdash; Can either be a `Boolean` specifying if a scrollbar should be rendered or an `Object` containing the following optional properties:
+  * **alpha** (Number) &mdash; The alpha to render the scrollbar  
+  * **colour** &mdash; The colour to render the scrollbar
+  * **width** (Number) &mdash; The width to render the scrollbar
 
 **Returns** a `ListView` object.
 
