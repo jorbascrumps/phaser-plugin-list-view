@@ -109,8 +109,9 @@ export default class ListView extends Phaser.GameObjects.Container {
             height
         } = this.getBounds();
         const percHeight = Phaser.Math.Clamp(this.camera.height / height, 0.1, 1);
+        const scrollbarHeight = Phaser.Math.Clamp(percHeight * this.height, 10, this.height);
 
-        this.scrollBar && this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, percHeight * this.height);
+        this.scrollBar && this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, scrollbarHeight);
     }
 
     add (items = []) {
