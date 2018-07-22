@@ -1,4 +1,4 @@
-# Phaser List View Plugin
+# Phaser ListView Plugin
 _Note: This project is currently in a prerelease state and is therefore subject to frequent (sometimes undocumented) breaking changes._
 
 ## Installation
@@ -57,6 +57,7 @@ Updates children positions after a mutation occurs. Primarily used for internal 
 **Returns** a `ListView` object.
 
 ## TODO
+- [ ] Add items at specified position
 - [ ] Additional documentation
 - [ ] Component demos
 - [ ] Tests
