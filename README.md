@@ -25,7 +25,18 @@ new Phaser.Game({
 ## Basic Usage
 The plugin registers a new custom `Game Object` that is available from within your scenes:
 ```js
-this.add.listview(100, 100, 500, 500);
+const listItems = new Array(15)
+    .fill()
+    .map((_, i) =>
+        this.add.text(0, 0, `Item #${i} (x1)`, {
+            fontSize: 20,
+            fontFamily: 'Arial'
+        })
+            .setPadding({ bottom: 12 })
+    );
+
+const listview = this.add.listview(0, 0, 200, 400)
+    .add(listItems);
 ```
 
 ## API
