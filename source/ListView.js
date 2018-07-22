@@ -20,6 +20,7 @@ export default class ListView extends Phaser.GameObjects.Container {
         });
 
         this.backgroundColour = background;
+        this.scrollBar;
         this.camera = this.scene.cameras.add(this.x, this.y, this.width, this.height);
 
         this.scrollPos = 0;
@@ -35,12 +36,22 @@ export default class ListView extends Phaser.GameObjects.Container {
             const clampedValue = Phaser.Math.Clamp(this.scrollPos - (y - this.y), min, max);
             const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
 
-            const barScroll = (this.height - this.scrollBar.displayHeight) * scrollPerc + this.y;
             const cameraScroll = clampedValue;
-
-            this.scrollBar.setY(barScroll);
             this.camera.setScroll(0, cameraScroll);
+
+            if (undefined !== this.scrollBar) {
+                const barScroll = (this.height - this.scrollBar.displayHeight) * scrollPerc + this.y;
+                this.scrollBar.setY(barScroll);
+            }
         });
+
+        this.createBackground();
+    }
+
+    setScrollbarEnabled (value) {
+        if (false === value) {
+            return this;
+        }
 
         this.scene.make.graphics({ x: 0, y: 0, add: false })
             .fillStyle(0xff0000, 1)
@@ -48,10 +59,11 @@ export default class ListView extends Phaser.GameObjects.Container {
             .generateTexture('scroll', 1, 1);
         this.scrollBar = this.scene.add.sprite(0, 0, 'scroll')
             .setOrigin(0, 0)
-            .setPosition(x + width, y)
+            .setPosition(this.x + this.width, this.y)
             .setInteractive({
                 useHandCursor: true
-            });
+            })
+            .setDepth(1);
         this.scene.input.setDraggable(this.scrollBar);
 
         this.scrollBar.on('drag', (pointer, x, y) => {
@@ -70,7 +82,7 @@ export default class ListView extends Phaser.GameObjects.Container {
             this.camera.setScroll(0, cameraScroll);
         });
 
-        this.createBackground();
+        return this;
     }
 
     preUpdate (...args) {
@@ -95,7 +107,7 @@ export default class ListView extends Phaser.GameObjects.Container {
         } = this.getBounds();
         const percHeight = Phaser.Math.Clamp(this.camera.height / height, 0.1, 1);
 
-        this.scrollBar.setDisplaySize(10, percHeight * this.height);
+        this.scrollBar && this.scrollBar.setDisplaySize(5, percHeight * this.height);
     }
 
     add (items = []) {
