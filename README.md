@@ -56,6 +56,9 @@ Updates children positions after a mutation occurs. Primarily used for internal 
 
 **Returns** a `ListView` object.
 
+## Events
+_TODO_
+
 ## TODO
 - [ ] Add items at specified position
 - [ ] Additional documentation
