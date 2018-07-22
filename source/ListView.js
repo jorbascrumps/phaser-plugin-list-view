@@ -51,7 +51,7 @@ export default class ListView extends Phaser.GameObjects.Container {
             return this;
         }
 
-        const colour = GetFastValue(config, 'colour');
+        const colour = GetFastValue(config, 'colour', 0xffffff);
         const alpha = colour ? GetFastValue(config, 'alpha', 1) : 0;
         const width = GetFastValue(config, 'width', 10);
 
