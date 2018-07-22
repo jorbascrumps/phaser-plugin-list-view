@@ -16,8 +16,7 @@ export default class ListView extends Phaser.GameObjects.Container {
         this.setInteractive({
             hitArea: new Phaser.Geom.Rectangle(width / 2, height / 2, width, height),
             hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-            draggable: true,
-            useHandCursor: true
+            draggable: true
         });
 
         this.backgroundColour = background;
@@ -100,6 +99,12 @@ export default class ListView extends Phaser.GameObjects.Container {
     }
 
     add (items = []) {
+        const {
+            itemdown,
+            itemover,
+            itemout
+        } = this._events;
+
         (Array.isArray(items) ? items : [ items ])
             .map(item => {
                 const {
@@ -110,7 +115,20 @@ export default class ListView extends Phaser.GameObjects.Container {
 
                 item
                     .setPosition(x, y)
-                    .setOrigin(0, 0);
+                    .setOrigin(0, 0)
+                    .setInteractive();
+
+                if (undefined !== itemdown) {
+                    item.on('pointerdown', () => itemdown.fn(item, this.list.indexOf(item), this.list));
+                }
+
+                if (undefined !== itemover) {
+                    item.on('pointerover', () => itemover.fn(item, this.list.indexOf(item), this.list));
+                }
+
+                if (undefined !== itemout) {
+                    item.on('pointerout', () => itemout.fn(item, this.list.indexOf(item), this.list));
+                }
 
                 super.add(item);
             });
