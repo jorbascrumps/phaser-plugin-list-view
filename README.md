@@ -51,6 +51,11 @@ this.add.listview(100, 100, 500, 500);
 
 **Returns** a `ListView` object.
 
+### `ListView.settle()`
+Updates children positions after a mutation occurs. Primarily used for internal operations but is available to you for special occasions.
+
+**Returns** a `ListView` object.
+
 ## TODO
 - [ ] Additional documentation
 - [ ] Component demos
