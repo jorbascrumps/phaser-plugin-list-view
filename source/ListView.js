@@ -1,3 +1,5 @@
+const GetFastValue = Phaser.Utils.Objects.GetFastValue;
+
 export default class ListView extends Phaser.GameObjects.Container {
 
     constructor ({
@@ -48,17 +50,22 @@ export default class ListView extends Phaser.GameObjects.Container {
         this.createBackground();
     }
 
-    setScrollbarEnabled (value) {
-        if (false === value) {
+    setScrollbarEnabled (config) {
+        if (!config) {
             return this;
         }
 
+        const colour = GetFastValue(config, 'colour');
+        const alpha = colour ? GetFastValue(config, 'alpha', 1) : 0;
+        const width = GetFastValue(config, 'width', 10);
+
         this.scene.make.graphics({ x: 0, y: 0, add: false })
-            .fillStyle(0xff0000, 1)
-            .fillRect(0, 0, 50, 10)
+            .fillStyle(colour, alpha)
+            .fillRect(0, 0, this.height, width)
             .generateTexture('scroll', 1, 1);
         this.scrollBar = this.scene.add.sprite(0, 0, 'scroll')
             .setOrigin(0, 0)
+            .setDisplaySize(width, this.height)
             .setPosition(this.x + this.width, this.y)
             .setInteractive({
                 useHandCursor: true
@@ -107,7 +114,7 @@ export default class ListView extends Phaser.GameObjects.Container {
         } = this.getBounds();
         const percHeight = Phaser.Math.Clamp(this.camera.height / height, 0.1, 1);
 
-        this.scrollBar && this.scrollBar.setDisplaySize(5, percHeight * this.height);
+        this.scrollBar && this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, percHeight * this.height);
     }
 
     add (items = []) {
