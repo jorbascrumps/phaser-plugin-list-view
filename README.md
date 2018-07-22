@@ -36,6 +36,12 @@ this.add.listview(100, 100, 500, 500);
 
 **Returns** a `ListView` object.
 
+### `ListView.removeAt(index)`
+#### Arguments
+* **index** (Number) &mdash; The index of the child to remove
+
+**Returns** a `ListView` object.
+
 ### `ListView.setScrollbarEnable(config)`
 #### Arguments
 * **config** (Boolean|Object) &mdash; Can either be a `Boolean` specifying if a scrollbar should be rendered or an `Object` containing the following optional properties:
