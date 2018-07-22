@@ -158,4 +158,26 @@ export default class ListView extends Phaser.GameObjects.Container {
         return this;
     }
 
+    settle () {
+        this.list.forEach((child, i) => {
+            if (i === 0) {
+                return child.setPosition(child.x, 0);
+            }
+
+            const prevChild = this.getAt(i - 1);
+
+            child.setPosition(child.x, prevChild.y + prevChild.height)
+        });
+
+        return this;
+    }
+
+    removeAt (index) {
+        super.removeAt(index);
+
+        this.settle();
+
+        return this;
+    }
+
 }
