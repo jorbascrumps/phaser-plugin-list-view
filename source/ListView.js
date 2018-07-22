@@ -7,8 +7,7 @@ export default class ListView extends Phaser.GameObjects.Container {
         height = 100,
         width = 100,
         x = 0,
-        y = 0,
-        background = 0x009688
+        y = 0
     } = {}) {
         super(context, x, y);
 
@@ -21,8 +20,7 @@ export default class ListView extends Phaser.GameObjects.Container {
             draggable: true
         });
 
-        this.backgroundColour = background;
-        this.scrollBar;
+        this.scrollBar = undefined;
         this.camera = this.scene.cameras.add(this.x, this.y, this.width, this.height);
 
         this.scrollPos = 0;
@@ -46,8 +44,6 @@ export default class ListView extends Phaser.GameObjects.Container {
                 this.scrollBar.setY(barScroll);
             }
         });
-
-        this.createBackground();
     }
 
     setScrollbarEnabled (config) {
@@ -159,13 +155,6 @@ export default class ListView extends Phaser.GameObjects.Container {
         this.camera.setBounds(this.x, this.y, width, height);
 
         return this;
-    }
-
-    createBackground () {
-        return this.scene.add.graphics(0, 0)
-            .fillStyle(this.backgroundColour, 1)
-            .fillRoundedRect(this.x, this.y, this.width, this.height, 5)
-            .setDepth(-1);
     }
 
 }
