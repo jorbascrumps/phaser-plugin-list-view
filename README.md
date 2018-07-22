@@ -1,20 +1,20 @@
-# Phaser Window Manager
-_Note: Phaser Window Manager is currently in a prerelease state and is therefore subject to frequent (sometimes undocumented) breaking changes._
+# Phaser List View Plugin
+_Note: This project is currently in a prerelease state and is therefore subject to frequent (sometimes undocumented) breaking changes._
 
 ## Installation
 ```
-npm i phaser-window-manager
+npm i phaser-plugin-list-view -S
 ```
 Then add to your game config:
 ```js
-import WindowManagerPlugin from 'phaser-window-manager';
+import ListViewPlugin from 'phaser-plugin-list-view';
 
 new Phaser.Game({
   plugins: [
     scene: [
       {
-        key: 'WindowManager',
-        plugin: WindowManagerPlugin,
+        key: 'ListView',
+        plugin: ListViewPlugin,
         start: true
       }
     ]
@@ -22,15 +22,15 @@ new Phaser.Game({
 });
 ```
 
-## Components
-The plugin registers the following custom Game Objects that are available from within your scenes:
-
-### `ListView`
-#### Example Usage
+## Basic Usage
+The plugin registers a new custom `Game Object` that is available from within your scenes:
 ```js
 this.add.listview(100, 100, 500, 500);
 ```
-#### `ListView.add(child)`
+
+## API
+
+### `ListView.add(child)`
 ##### Arguments
 * **child** (GameObject|GameObject[]) &mdash; The child to add to the bottom of the list
 
