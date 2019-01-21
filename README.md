@@ -36,6 +36,7 @@ const listItems = new Array(15)
     );
 
 const listview = this.add.listview(0, 0, 200, 400)
+    .on('pointerdown', (item, i, items) => console.log(`Item #${i} was clicked`))
     .add(listItems);
 ```
 
@@ -62,13 +63,17 @@ const listview = this.add.listview(0, 0, 200, 400)
 
 **Returns** a `ListView` object.
 
+### `ListView.on(event, fn)`
+#### Arguments
+* **event** (String) &mdash; Any Phaser v3 GameObject event (ie, `pointerdown`) that will be attached to each list item. Refer to [the documentation](https://photonstorm.github.io/phaser3-docs/index.html) for details 
+* **fn(item, index, items)** (Function) &mdash; The callback function for the event
+
+**Returns** a `ListView` object.
+
 ### `ListView.settle()`
 Updates children positions after a mutation occurs. Primarily used for internal operations but is available to you for special occasions.
 
 **Returns** a `ListView` object.
-
-## Events
-_TODO_
 
 ## TODO
 - [ ] Add items at specified position
