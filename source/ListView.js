@@ -1,49 +1,63 @@
 const GetFastValue = Phaser.Utils.Objects.GetFastValue;
 
-export default class ListView extends Phaser.GameObjects.Container {
+export default class ListView extends Phaser.GameObjects.Group {
 
     constructor ({
+        id,
         context,
         height = 100,
         width = 100,
         x = 0,
         y = 0
     } = {}) {
-        super(context, x, y);
+        super(context, null, {});
 
-        this.setExclusive(true);
-        this.setSize(width, height);
+        this.id = id;
+        this.width = width;
+        this.height = height;
+        this.x = x;
+        this.y = y;
+        this.events = {};
+        this.createCallback = this.settle;
 
-        this.setInteractive({
-            hitArea: new Phaser.Geom.Rectangle(width / 2, height / 2, width, height),
-            hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-            draggable: true
-        });
+        this.zone = new Phaser.GameObjects.Zone(context, x, y, width, height)
+            .setInteractive({
+                hitArea: new Phaser.Geom.Rectangle(width / 2, height / 2, width, height),
+                hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                draggable: true
+            });
 
-        this.scrollBar = undefined;
-        this.camera = this.scene.cameras.add(this.x, this.y, this.width, this.height);
+        const cameraName = `ListViewCamera${this.id}`;
+        this.camera = this.scene.cameras.add(x, y, width, height)
+            .setOrigin(0, 0)
+            .setName(cameraName);
+
+        /*
+        NOTE: Drag is temporarily disabled
 
         this.scrollPos = 0;
-        this.scene.input.on('dragstart', (pointer, target) => target === this && (this.scrollPos = this.camera.scrollY));
-        this.scene.input.on('drag', (pointer, target, x, y) => {
-            if (target !== this) return;
-
-            const {
-                height
-            } = this.getBounds();
+        this.zone.on('dragstart', (pointer, x, y) => this.scrollPos = this.camera.scrollY);
+        this.zone.on('drag', (pointer, x, y) => {
             const min = this.y;
-            const max = this.y + height - this.camera.height;
-            const clampedValue = Phaser.Math.Clamp(this.scrollPos - (y - this.y), min, max);
-            const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
+            const max = this.y + this.camera._bounds.height - this.camera.height;
 
-            const cameraScroll = clampedValue;
-            this.camera.setScroll(0, cameraScroll);
+            const clampedValue = Phaser.Math.Clamp(y, min, max);
+            const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
+            const cameraScroll = this.camera.height - clampedValue;
+
+            if (isNaN(scrollPerc)) {
+                return;
+            }
+
+            this.camera.setScroll(0, this.scrollPos + cameraScroll);
 
             if (undefined !== this.scrollBar) {
-                const barScroll = (this.height - this.scrollBar.displayHeight) * scrollPerc + this.y;
+                const barScroll = this.y + (this.height - this.scrollBar.displayHeight) * (1 - scrollPerc);
+
                 this.scrollBar.setY(barScroll);
             }
         });
+        */
     }
 
     setScrollbarEnabled (config) {
@@ -54,12 +68,13 @@ export default class ListView extends Phaser.GameObjects.Container {
         const colour = GetFastValue(config, 'colour', 0xffffff);
         const alpha = colour ? GetFastValue(config, 'alpha', 1) : 0;
         const width = GetFastValue(config, 'width', 10);
+        const textureName = `ListViewScrollBarTex${this.id}`;
 
         this.scene.make.graphics({ x: 0, y: 0, add: false })
             .fillStyle(colour, alpha)
-            .fillRect(0, 0, this.height, width)
-            .generateTexture('scroll', 1, 1);
-        this.scrollBar = this.scene.add.sprite(0, 0, 'scroll')
+            .fillRect(0, 0, 100, 100)
+            .generateTexture(textureName, 10, 10);
+        this.scrollBar = this.scene.add.image(0, 0, textureName)
             .setOrigin(0, 0)
             .setDisplaySize(width, this.height)
             .setPosition(this.x + this.width, this.y)
@@ -67,19 +82,22 @@ export default class ListView extends Phaser.GameObjects.Container {
                 useHandCursor: true
             })
             .setDepth(1);
+
         this.scene.input.setDraggable(this.scrollBar);
 
         this.scrollBar.on('drag', (pointer, x, y) => {
-            const {
-                height
-            } = this.getBounds();
             const min = this.y;
             const max = this.y + this.height - this.scrollBar.displayHeight;
-            const clampedValue = Phaser.Math.Clamp(y, this.y, this.y + this.height - this.scrollBar.displayHeight);
-            const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
 
+            const clampedValue = Phaser.Math.Clamp(y, min, max);
+            const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
             const barScroll = clampedValue;
-            const cameraScroll = (height - this.camera.height)  * scrollPerc + this.y;
+
+            if (isNaN(scrollPerc)) {
+                return;
+            }
+
+            const cameraScroll = this.y + (this.camera._bounds.height - this.camera.height) * scrollPerc;
 
             this.scrollBar.setY(barScroll);
             this.camera.setScroll(0, cameraScroll);
@@ -88,26 +106,36 @@ export default class ListView extends Phaser.GameObjects.Container {
         return this;
     }
 
-    preUpdate (...args) {
+    preUpdate () {
         const cameras = this.scene.cameras.cameras;
 
-        this.getAll()
-            .forEach(child =>
-                cameras.forEach(camera =>
-                    camera.id !== this.camera.id && camera.ignore(child)
-                )
-            );
+        for (const child of this.getChildren()) {
+            for (const camera of cameras) {
+                if (camera.id === this.camera.id) {
+                    continue;
+                }
 
-        this.scene.sys.displayList.getAll()
-            .forEach(child => this.camera.ignore(child));
+                camera.ignore(child);
+            }
+        }
 
-        return this.update(...args);
+        for (const child of this.scene.sys.displayList.getAll()) {
+            if (this.contains(child)) {
+                continue;
+            }
+
+            this.camera.ignore(child);
+        }
     }
 
     update() {
         const {
-            height
-        } = this.getBounds();
+            camera: {
+                _bounds: {
+                    height
+                }
+            }
+        } = this;
         const percHeight = Phaser.Math.Clamp(this.camera.height / height, 0.1, 1);
         const scrollbarHeight = Phaser.Math.Clamp(percHeight * this.height, 10, this.height);
 
@@ -115,39 +143,29 @@ export default class ListView extends Phaser.GameObjects.Container {
     }
 
     add (items = []) {
-        const {
-            itemdown,
-            itemover,
-            itemout
-        } = this._events;
+        for (const item of Array.isArray(items) ? items : [ items ]) {
+            const listBounds = this.getBounds();
+            const itemBounds = item.getBounds();
 
-        (Array.isArray(items) ? items : [ items ])
-            .map(item => {
-                const {
-                    height
-                } = this.getBounds();
-                const x = 0;
-                const y = height;
+            item
+                .setPosition(this.x, this.y + listBounds.height)
+                .setInteractive({
+                    hitArea: new Phaser.Geom.Rectangle(0, 0, itemBounds.width, itemBounds.height),
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true,
+                    draggable: true,
+                });
 
-                item
-                    .setPosition(x, y)
-                    .setOrigin(0, 0)
-                    .setInteractive();
+            for (const event in this.events) {
+                item.on(event, () => this.events[event](
+                    item,
+                    this.getChildren().indexOf(item),
+                    this.getChildren()
+                ));
+            }
 
-                if (undefined !== itemdown) {
-                    item.on('pointerdown', () => itemdown.fn(item, this.list.indexOf(item), this.list));
-                }
-
-                if (undefined !== itemover) {
-                    item.on('pointerover', () => itemover.fn(item, this.list.indexOf(item), this.list));
-                }
-
-                if (undefined !== itemout) {
-                    item.on('pointerout', () => itemout.fn(item, this.list.indexOf(item), this.list));
-                }
-
-                super.add(item);
-            });
+            super.add(item);
+        }
 
         const {
             height,
@@ -159,25 +177,37 @@ export default class ListView extends Phaser.GameObjects.Container {
     }
 
     settle () {
-        this.list.forEach((child, i) => {
-            if (i === 0) {
-                return child.setPosition(child.x, 0);
-            }
+        const {
+            height,
+            width,
+            x,
+            y,
+        } = this.getBounds();
 
-            const prevChild = this.getAt(i - 1);
+        this.camera.setBounds(x, y, width, height);
 
-            child.setPosition(child.x, prevChild.y + prevChild.height)
-        });
+        const percHeight = Phaser.Math.Clamp(this.camera.height / this.camera._bounds.height, 0.1, 1);
+        const scrollbarHeight = Phaser.Math.Clamp(percHeight * this.height, 10, this.height);
+
+        this.scrollBar && this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, scrollbarHeight);
 
         return this;
     }
 
-    removeAt (index) {
-        super.removeAt(index);
-
-        this.settle();
+    on (event, fn) {
+        this.events[event] = fn;
 
         return this;
+    }
+
+    getBounds () {
+        let bounds = new Phaser.Geom.Rectangle(this.x, this.y, 0, 0);
+
+        for (const child of this.getChildren()) {
+            Phaser.Geom.Rectangle.MergeRect(bounds, child.getBounds());
+        }
+
+        return bounds;
     }
 
 }

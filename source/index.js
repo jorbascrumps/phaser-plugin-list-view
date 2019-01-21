@@ -10,6 +10,7 @@ export default class WindowManager extends Phaser.Plugins.BasePlugin {
 
     createListView (x, y, width, height) {
         const listview = new ListView({
+            id: Date.now(),
             context: this.scene,
             height,
             width,
@@ -17,7 +18,6 @@ export default class WindowManager extends Phaser.Plugins.BasePlugin {
             y
         });
 
-        this.displayList.add(listview);
         this.updateList.add(listview);
 
         return listview;
