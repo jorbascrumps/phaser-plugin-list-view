@@ -82,4 +82,6 @@ This plugin utilizes Phaser's GameObject exclusion to create the scrolling effec
 - [ ] Add items at specified position
 - [ ] Additional documentation
 - [ ] Component demos
+- [ ] Touch controls/ draggable scroll
+- [ ] Integration with ScaleManager
 - [ ] Tests
