@@ -1,6 +1,6 @@
 import ListView from './ListView';
 
-export default class WindowManager extends Phaser.Plugins.BasePlugin {
+export default class ListViewPlugin extends Phaser.Plugins.BasePlugin {
 
     constructor (scene, pluginManager) {
         super(scene, pluginManager);
