@@ -1,5 +1,5 @@
 # Phaser ListView Plugin
-_Note: This project is currently in a prerelease state and is therefore subject to frequent (sometimes undocumented) breaking changes._
+[View demo](https://iamchristopher.github.io/phaser-plugin-list-view/)
 
 ## Installation
 ```
