@@ -360,6 +360,17 @@ var ListViewPlugin = (function () {
         return this;
       }
     }, {
+      key: "removeAt",
+      value: function removeAt(index) {
+        var childToRemove = this.children.entries[index];
+
+        if ('undefined' === typeof childToRemove) {
+          return this;
+        }
+
+        return this.remove(childToRemove);
+      }
+    }, {
       key: "settle",
       value: function settle() {
         var childY = this.y;

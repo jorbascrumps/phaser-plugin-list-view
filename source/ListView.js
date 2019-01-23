@@ -177,6 +177,16 @@ export default class ListView extends Phaser.GameObjects.Group {
         return this;
     }
 
+    removeAt (index) {
+        const childToRemove = this.children.entries[index];
+
+        if ('undefined' === typeof childToRemove) {
+            return this;
+        }
+
+        return this.remove(childToRemove);
+    }
+
     settle () {
         let childY = this.y;
         for (const child of this.getChildren()) {

@@ -48,6 +48,12 @@ const listview = this.add.listview(0, 0, 200, 400)
 
 **Returns** a `ListView` object.
 
+### `ListView.remove(item)`
+#### Arguments
+* **item** (GameObject) &mdash; The child to remove
+
+**Returns** a `ListView` object.
+
 ### `ListView.removeAt(index)`
 #### Arguments
 * **index** (Number) &mdash; The index of the child to remove
