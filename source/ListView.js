@@ -19,6 +19,7 @@ export default class ListView extends Phaser.GameObjects.Group {
         this.y = y;
         this.events = {};
         this.createCallback = this.settle;
+        this.removeCallback = this.settle;
 
         this.zone = new Phaser.GameObjects.Zone(context, x, y, width, height)
             .setInteractive({
@@ -177,6 +178,13 @@ export default class ListView extends Phaser.GameObjects.Group {
     }
 
     settle () {
+        let childY = this.y;
+        for (const child of this.getChildren()) {
+            child.setPosition(this.x, childY);
+
+            childY += child.getBounds().height;
+        }
+
         const {
             height,
             width,

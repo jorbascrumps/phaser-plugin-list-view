@@ -132,6 +132,7 @@ var ListViewPlugin = (function () {
       _this.y = y;
       _this.events = {};
       _this.createCallback = _this.settle;
+      _this.removeCallback = _this.settle;
       _this.zone = new Phaser.GameObjects.Zone(context, x, y, width, height).setInteractive({
         hitArea: new Phaser.Geom.Rectangle(width / 2, height / 2, width, height),
         hitAreaCallback: Phaser.Geom.Rectangle.Contains,
@@ -361,6 +362,32 @@ var ListViewPlugin = (function () {
     }, {
       key: "settle",
       value: function settle() {
+        var childY = this.y;
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+          for (var _iterator5 = this.getChildren()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var child = _step5.value;
+            child.setPosition(this.x, childY);
+            childY += child.getBounds().height;
+          }
+        } catch (err) {
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+              _iterator5.return();
+            }
+          } finally {
+            if (_didIteratorError5) {
+              throw _iteratorError5;
+            }
+          }
+        }
+
         var _this$getBounds2 = this.getBounds(),
             height = _this$getBounds2.height,
             width = _this$getBounds2.width,
@@ -383,26 +410,26 @@ var ListViewPlugin = (function () {
       key: "getBounds",
       value: function getBounds() {
         var bounds = new Phaser.Geom.Rectangle(this.x, this.y, 0, 0);
-        var _iteratorNormalCompletion5 = true;
-        var _didIteratorError5 = false;
-        var _iteratorError5 = undefined;
+        var _iteratorNormalCompletion6 = true;
+        var _didIteratorError6 = false;
+        var _iteratorError6 = undefined;
 
         try {
-          for (var _iterator5 = this.getChildren()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var child = _step5.value;
+          for (var _iterator6 = this.getChildren()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+            var child = _step6.value;
             Phaser.Geom.Rectangle.MergeRect(bounds, child.getBounds());
           }
         } catch (err) {
-          _didIteratorError5 = true;
-          _iteratorError5 = err;
+          _didIteratorError6 = true;
+          _iteratorError6 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-              _iterator5.return();
+            if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+              _iterator6.return();
             }
           } finally {
-            if (_didIteratorError5) {
-              throw _iteratorError5;
+            if (_didIteratorError6) {
+              throw _iteratorError6;
             }
           }
         }
