@@ -18,6 +18,7 @@ export default class ListView extends Phaser.GameObjects.Group {
         this.x = x;
         this.y = y;
         this.events = {};
+        this.hideScrollbarWhenEmpty = false;
         this.createCallback = this.settle;
         this.removeCallback = this.settle;
 
@@ -70,6 +71,7 @@ export default class ListView extends Phaser.GameObjects.Group {
         const alpha = colour ? GetFastValue(config, 'alpha', 1) : 0;
         const width = GetFastValue(config, 'width', 10);
         const textureName = `ListViewScrollBarTex${this.id}`;
+        this.hideScrollbarWhenEmpty = GetFastValue(config, 'hideWhenEmpty', false);
 
         this.scene.make.graphics({ x: 0, y: 0, add: false })
             .fillStyle(colour, alpha)
@@ -103,6 +105,8 @@ export default class ListView extends Phaser.GameObjects.Group {
             this.scrollBar.setY(barScroll);
             this.camera.setScroll(0, cameraScroll);
         });
+
+        this.settle();
 
         return this;
     }
@@ -188,8 +192,9 @@ export default class ListView extends Phaser.GameObjects.Group {
     }
 
     settle () {
+        const children = this.getChildren();
         let childY = this.y;
-        for (const child of this.getChildren()) {
+        for (const child of children) {
             child.setPosition(this.x, childY);
 
             childY += child.getBounds().height;
@@ -207,7 +212,15 @@ export default class ListView extends Phaser.GameObjects.Group {
         const percHeight = Phaser.Math.Clamp(this.camera.height / this.camera._bounds.height, 0.1, 1);
         const scrollbarHeight = Phaser.Math.Clamp(percHeight * this.height, 10, this.height);
 
-        this.scrollBar && this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, scrollbarHeight);
+        if (this.scrollBar) {
+            this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, scrollbarHeight);
+
+            if (this.hideScrollbarWhenEmpty && children.length === 0) {
+                this.scrollBar.setVisible(false);
+            } else {
+                this.scrollBar.setVisible(true);
+            }
+        }
 
         return this;
     }

@@ -131,6 +131,7 @@ var ListViewPlugin = (function () {
       _this.x = x;
       _this.y = y;
       _this.events = {};
+      _this.hideScrollbarWhenEmpty = false;
       _this.createCallback = _this.settle;
       _this.removeCallback = _this.settle;
       _this.zone = new Phaser.GameObjects.Zone(context, x, y, width, height).setInteractive({
@@ -177,6 +178,7 @@ var ListViewPlugin = (function () {
         var alpha = colour ? GetFastValue(config, 'alpha', 1) : 0;
         var width = GetFastValue(config, 'width', 10);
         var textureName = "ListViewScrollBarTex".concat(this.id);
+        this.hideScrollbarWhenEmpty = GetFastValue(config, 'hideWhenEmpty', false);
         this.scene.make.graphics({
           x: 0,
           y: 0,
@@ -203,6 +205,7 @@ var ListViewPlugin = (function () {
 
           _this2.camera.setScroll(0, cameraScroll);
         });
+        this.settle();
         return this;
       }
     }, {
@@ -373,13 +376,14 @@ var ListViewPlugin = (function () {
     }, {
       key: "settle",
       value: function settle() {
+        var children = this.getChildren();
         var childY = this.y;
         var _iteratorNormalCompletion5 = true;
         var _didIteratorError5 = false;
         var _iteratorError5 = undefined;
 
         try {
-          for (var _iterator5 = this.getChildren()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          for (var _iterator5 = children[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
             var child = _step5.value;
             child.setPosition(this.x, childY);
             childY += child.getBounds().height;
@@ -408,7 +412,17 @@ var ListViewPlugin = (function () {
         this.camera.setBounds(x, y, width, height);
         var percHeight = Phaser.Math.Clamp(this.camera.height / this.camera._bounds.height, 0.1, 1);
         var scrollbarHeight = Phaser.Math.Clamp(percHeight * this.height, 10, this.height);
-        this.scrollBar && this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, scrollbarHeight);
+
+        if (this.scrollBar) {
+          this.scrollBar.setDisplaySize(this.scrollBar.displayWidth, scrollbarHeight);
+
+          if (this.hideScrollbarWhenEmpty && children.length === 0) {
+            this.scrollBar.setVisible(false);
+          } else {
+            this.scrollBar.setVisible(true);
+          }
+        }
+
         return this;
       }
     }, {
