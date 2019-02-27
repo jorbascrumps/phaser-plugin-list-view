@@ -200,6 +200,10 @@ export default class ListView extends Phaser.GameObjects.Group {
             childY += child.getBounds().height;
         }
 
+        return this.resizeCamera();
+    }
+
+    resizeCamera () {
         const {
             height,
             width,
