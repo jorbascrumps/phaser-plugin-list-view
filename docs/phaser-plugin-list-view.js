@@ -23,6 +23,40 @@ var ListViewPlugin = (function () {
     return Constructor;
   }
 
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function _objectSpread(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+      var ownKeys = Object.keys(source);
+
+      if (typeof Object.getOwnPropertySymbols === 'function') {
+        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+        }));
+      }
+
+      ownKeys.forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    }
+
+    return target;
+  }
+
   function _inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
@@ -52,6 +86,42 @@ var ListViewPlugin = (function () {
     };
 
     return _setPrototypeOf(o, p);
+  }
+
+  function _objectWithoutPropertiesLoose(source, excluded) {
+    if (source == null) return {};
+    var target = {};
+    var sourceKeys = Object.keys(source);
+    var key, i;
+
+    for (i = 0; i < sourceKeys.length; i++) {
+      key = sourceKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      target[key] = source[key];
+    }
+
+    return target;
+  }
+
+  function _objectWithoutProperties(source, excluded) {
+    if (source == null) return {};
+
+    var target = _objectWithoutPropertiesLoose(source, excluded);
+
+    var key, i;
+
+    if (Object.getOwnPropertySymbols) {
+      var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+      for (i = 0; i < sourceSymbolKeys.length; i++) {
+        key = sourceSymbolKeys[i];
+        if (excluded.indexOf(key) >= 0) continue;
+        if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+        target[key] = source[key];
+      }
+    }
+
+    return target;
   }
 
   function _assertThisInitialized(self) {
@@ -403,6 +473,11 @@ var ListViewPlugin = (function () {
           }
         }
 
+        return this.resizeCamera();
+      }
+    }, {
+      key: "resizeCamera",
+      value: function resizeCamera() {
         var _this$getBounds2 = this.getBounds(),
             height = _this$getBounds2.height,
             width = _this$getBounds2.width,
@@ -466,6 +541,62 @@ var ListViewPlugin = (function () {
     return ListView;
   }(Phaser.GameObjects.Group);
 
+  var GridView =
+  /*#__PURE__*/
+  function (_ListView) {
+    _inherits(GridView, _ListView);
+
+    function GridView(_ref) {
+      var _this;
+
+      var _ref$cellWidth = _ref.cellWidth,
+          cellWidth = _ref$cellWidth === void 0 ? undefined : _ref$cellWidth,
+          _ref$cellHeight = _ref.cellHeight,
+          cellHeight = _ref$cellHeight === void 0 ? undefined : _ref$cellHeight,
+          _ref$gutter = _ref.gutter,
+          gutter = _ref$gutter === void 0 ? 0 : _ref$gutter,
+          options = _objectWithoutProperties(_ref, ["cellWidth", "cellHeight", "gutter"]);
+
+      _classCallCheck(this, GridView);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(GridView).call(this, options));
+      _this.height = options.height + gutter;
+      _this.width = options.width + gutter;
+      _this.cellHeight = parseInt(cellHeight, 10);
+      _this.cellWidth = parseInt(cellWidth, 10);
+      _this.gutter = parseInt(gutter, 10);
+      return _this;
+    }
+
+    _createClass(GridView, [{
+      key: "settle",
+      value: function settle() {
+        var children = this.getChildren();
+
+        if (children.length === 0) {
+          return this;
+        }
+
+        var _children$0$getBounds = children[0].getBounds(),
+            height = _children$0$getBounds.height,
+            width = _children$0$getBounds.width;
+
+        var cellWidth = (this.cellWidth || width) + this.gutter;
+        var cellHeight = (this.cellHeight || height) + this.gutter;
+        Phaser.Actions.GridAlign(children, {
+          width: Math.floor(this.width / cellWidth),
+          cellWidth: cellWidth,
+          cellHeight: cellHeight,
+          x: this.x + cellWidth / 2 + this.gutter,
+          y: this.y + cellHeight / 2 + this.gutter
+        });
+        return this.resizeCamera();
+      }
+    }]);
+
+    return GridView;
+  }(ListView);
+
   var ListViewPlugin =
   /*#__PURE__*/
   function (_Phaser$Plugins$BaseP) {
@@ -477,11 +608,26 @@ var ListViewPlugin = (function () {
       _classCallCheck(this, ListViewPlugin);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(ListViewPlugin).call(this, scene, pluginManager));
+      pluginManager.registerGameObject('gridview', _this.createGridView);
       pluginManager.registerGameObject('listview', _this.createListView);
       return _this;
     }
 
     _createClass(ListViewPlugin, [{
+      key: "createGridView",
+      value: function createGridView(x, y, width, height, options) {
+        var gridview = new GridView(_objectSpread({}, options, {
+          id: Date.now(),
+          context: this.scene,
+          height: height,
+          width: width,
+          x: x,
+          y: y
+        }));
+        this.updateList.add(gridview);
+        return gridview;
+      }
+    }, {
       key: "createListView",
       value: function createListView(x, y, width, height) {
         var listview = new ListView({
