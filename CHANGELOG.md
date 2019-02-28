@@ -1,4 +1,4 @@
-## 1.1.0 (In development)
+## 1.1.0 (February 27, 2019)
 ### New Features
 * Added `GridView` component
 * Items can now be removed via index with `ListView.removeAt`
