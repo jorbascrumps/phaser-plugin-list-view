@@ -1,8 +1,8 @@
 # Phaser ListView Plugin
 
 ## Demos
-* [GridView](https://iamchristopher.github.io/phaser-plugin-list-view/grid.html)
-* [ListView](https://iamchristopher.github.io/phaser-plugin-list-view/list.html)
+* [GridView](https://jorbascrumps.github.io/phaser-plugin-list-view/grid.html)
+* [ListView](https://jorbascrumps.github.io/phaser-plugin-list-view/list.html)
 
 ## Installation
 ```
