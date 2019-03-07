@@ -86,7 +86,7 @@ Updates children positions after a mutation occurs. Primarily used for internal 
 **Returns** a `ListView` object.
 
 ## Limitations
-This plugin utilizes Phaser's GameObject exclusion to create the scrolling effect. As of this writing, Phaser only [supports 31 unique cameras](https://github.com/photonstorm/phaser/blob/master/src/cameras/2d/CameraManager.js#L37-L41) before being unable to support GameObject exclusion. This means that your game can only contain a limited amount of `ListViews` (31 minus however many cameras you've added yourself).
+This plugin utilizes Phaser's GameObject exclusion to create the scrolling effect. As of this writing, Phaser only [supports 31 unique cameras](https://github.com/photonstorm/phaser/blob/master/src/cameras/2d/CameraManager.js#L37-L41) before being unable to support GameObject exclusion. This means that your game can only contain a limited amount of `ListViews` (31 minus however many cameras you've added _before_ creating your `ListViews`).
 
 ## TODO
 - [ ] Add items at specified position
