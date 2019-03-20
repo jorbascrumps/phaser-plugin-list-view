@@ -170,6 +170,40 @@ var ListViewPlugin = (function () {
     return _get(target, property, receiver || target);
   }
 
+  function _classPrivateFieldGet(receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+      throw new TypeError("attempted to get private field on non-instance");
+    }
+
+    var descriptor = privateMap.get(receiver);
+
+    if (descriptor.get) {
+      return descriptor.get.call(receiver);
+    }
+
+    return descriptor.value;
+  }
+
+  function _classPrivateFieldSet(receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+      throw new TypeError("attempted to set private field on non-instance");
+    }
+
+    var descriptor = privateMap.get(receiver);
+
+    if (descriptor.set) {
+      descriptor.set.call(receiver, value);
+    } else {
+      if (!descriptor.writable) {
+        throw new TypeError("attempted to set read only private field");
+      }
+
+      descriptor.value = value;
+    }
+
+    return value;
+  }
+
   var GetFastValue = Phaser.Utils.Objects.GetFastValue;
 
   var ListView =
@@ -195,6 +229,12 @@ var ListViewPlugin = (function () {
       _classCallCheck(this, ListView);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(ListView).call(this, context, null, {}));
+
+      _gutter.set(_assertThisInitialized(_this), {
+        writable: true,
+        value: 0
+      });
+
       _this.id = id;
       _this.width = width;
       _this.height = height;
@@ -236,6 +276,13 @@ var ListViewPlugin = (function () {
     }
 
     _createClass(ListView, [{
+      key: "setGutter",
+      value: function setGutter(val) {
+        _classPrivateFieldSet(this, _gutter, Math.max(val, 0));
+
+        return this;
+      }
+    }, {
       key: "setScrollbarEnabled",
       value: function setScrollbarEnabled(config) {
         var _this2 = this;
@@ -447,6 +494,11 @@ var ListViewPlugin = (function () {
       key: "settle",
       value: function settle() {
         var children = this.getChildren();
+
+        if (children.length === 0) {
+          return this;
+        }
+
         var childY = this.y;
         var _iteratorNormalCompletion5 = true;
         var _didIteratorError5 = false;
@@ -456,7 +508,7 @@ var ListViewPlugin = (function () {
           for (var _iterator5 = children[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
             var child = _step5.value;
             child.setPosition(this.x, childY);
-            childY += child.getBounds().height;
+            childY += child.getBounds().height + _classPrivateFieldGet(this, _gutter);
           }
         } catch (err) {
           _didIteratorError5 = true;
@@ -540,6 +592,8 @@ var ListViewPlugin = (function () {
 
     return ListView;
   }(Phaser.GameObjects.Group);
+
+  var _gutter = new WeakMap();
 
   var GridView =
   /*#__PURE__*/
