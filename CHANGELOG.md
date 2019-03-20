@@ -1,6 +1,7 @@
 ## 1.2.0 (In development)
 ### New Features
 * Added support for `ListView`  item gutters via `ListView.setGutter` (#3)
+* Added scrollbar track with support for colour and alpha (#4)
 
 ## 1.1.0 (February 27, 2019)
 ### New Features
