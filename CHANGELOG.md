@@ -1,3 +1,7 @@
+## 1.2.0 (In development)
+### New Features
+* Added support for `ListView`  item gutters via `ListView.setGutter` (#3)
+
 ## 1.1.0 (February 27, 2019)
 ### New Features
 * Added `GridView` component
