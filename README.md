@@ -70,6 +70,9 @@ const listview = this.add.listview(0, 0, 200, 400)
   * **colour** &mdash; The colour to render the scrollbar
   * **hideWhenEmpty** (Boolean) &mdash; Sets whether the scrollbar should be visible when there are no items to display. Default value is `false`
   * **width** (Number) &mdash; The width to render the scrollbar
+  * **track** (Object)
+    * **alpha** (Number) &mdash; Alpha value of the scrollbar track. Default value is 1 if a colour is provided, otherwise 0
+    * **colour** (Number) &mdash; Colour of the scrollbar track. Default value is `undefined`
 
 **Returns** a `ListView` object.
 
