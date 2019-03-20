@@ -44,6 +44,7 @@ function create () {
             colour: 0x6666ff,
             width: 16,
         })
+        .setGutter(1)
         .on('pointerover',onItemOver)
         .on('pointerout', onItemOut)
         .on('pointerdown', onItemDown)
