@@ -284,18 +284,32 @@ var ListViewPlugin = (function () {
       }
     }, {
       key: "setScrollbarEnabled",
-      value: function setScrollbarEnabled(config) {
-        var _this2 = this;
+      value: function setScrollbarEnabled() {
+        var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+            _ref2$colour = _ref2.colour,
+            colour = _ref2$colour === void 0 ? 0xffffff : _ref2$colour,
+            _ref2$alpha = _ref2.alpha,
+            alpha = _ref2$alpha === void 0 ? colour ? 1 : 0 : _ref2$alpha,
+            _ref2$hideWhenEmpty = _ref2.hideWhenEmpty,
+            hideWhenEmpty = _ref2$hideWhenEmpty === void 0 ? false : _ref2$hideWhenEmpty,
+            _ref2$track = _ref2.track;
 
-        if (!config) {
-          return this;
-        }
-
-        var colour = GetFastValue(config, 'colour', 0xffffff);
-        var alpha = colour ? GetFastValue(config, 'alpha', 1) : 0;
-        var width = GetFastValue(config, 'width', 10);
+        _ref2$track = _ref2$track === void 0 ? {} : _ref2$track;
+        var trackColour = _ref2$track.colour,
+            _ref2$track$alpha = _ref2$track.alpha,
+            trackAlpha = _ref2$track$alpha === void 0 ? trackColour ? 1 : 0 : _ref2$track$alpha,
+            _ref2$width = _ref2.width,
+            width = _ref2$width === void 0 ? 10 : _ref2$width;
         var textureName = "ListViewScrollBarTex".concat(this.id);
-        this.hideScrollbarWhenEmpty = GetFastValue(config, 'hideWhenEmpty', false);
+        var trackTextureName = "ListViewScrollTrackTex".concat(this.id);
+        this.hideScrollbarWhenEmpty = hideWhenEmpty;
+        this.scene.make.graphics({
+          x: 0,
+          y: 0,
+          add: false
+        }).fillStyle(trackColour, trackAlpha).fillRect(0, 0, width, this.height).generateTexture(trackTextureName, width, this.height);
+        var track = this.scene.add.image(0, 0, trackTextureName).setOrigin(0, 0).setPosition(this.x + this.width, this.y).setInteractive();
+        track.on('pointerdown', this.calculateScrollPositionFromPointer, this);
         this.scene.make.graphics({
           x: 0,
           y: 0,
@@ -305,25 +319,26 @@ var ListViewPlugin = (function () {
           useHandCursor: true
         }).setDepth(1);
         this.scene.input.setDraggable(this.scrollBar);
-        this.scrollBar.on('drag', function (pointer, x, y) {
-          var min = _this2.y;
-          var max = _this2.y + _this2.height - _this2.scrollBar.displayHeight;
-          var clampedValue = Phaser.Math.Clamp(y, min, max);
-          var scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
-          var barScroll = clampedValue;
-
-          if (isNaN(scrollPerc)) {
-            return;
-          }
-
-          var cameraScroll = _this2.y + (_this2.camera._bounds.height - _this2.camera.height) * scrollPerc;
-
-          _this2.scrollBar.setY(barScroll);
-
-          _this2.camera.setScroll(0, cameraScroll);
-        });
+        this.scrollBar.on('drag', this.calculateScrollPositionFromPointer, this);
         this.settle();
         return this;
+      }
+    }, {
+      key: "calculateScrollPositionFromPointer",
+      value: function calculateScrollPositionFromPointer(_, x, y) {
+        var min = this.y;
+        var max = this.y + this.height - this.scrollBar.displayHeight;
+        var clampedValue = Phaser.Math.Clamp(y, min, max);
+        var scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
+        var barScroll = clampedValue;
+
+        if (isNaN(scrollPerc)) {
+          return;
+        }
+
+        var cameraScroll = this.y + (this.camera._bounds.height - this.camera.height) * scrollPerc;
+        this.scrollBar.setY(barScroll);
+        this.camera.setScroll(0, cameraScroll);
       }
     }, {
       key: "preUpdate",
@@ -420,7 +435,7 @@ var ListViewPlugin = (function () {
     }, {
       key: "add",
       value: function add() {
-        var _this3 = this;
+        var _this2 = this;
 
         var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
         var _iteratorNormalCompletion4 = true;
@@ -431,10 +446,10 @@ var ListViewPlugin = (function () {
           var _loop = function _loop() {
             var item = _step4.value;
 
-            var listBounds = _this3.getBounds();
+            var listBounds = _this2.getBounds();
 
             var itemBounds = item.getBounds();
-            item.setPosition(_this3.x, _this3.y + listBounds.height).setInteractive({
+            item.setPosition(_this2.x, _this2.y + listBounds.height).setInteractive({
               hitArea: new Phaser.Geom.Rectangle(0, 0, itemBounds.width, itemBounds.height),
               hitAreaCallback: Phaser.Geom.Rectangle.Contains,
               useHandCursor: true,
@@ -443,15 +458,15 @@ var ListViewPlugin = (function () {
 
             var _loop2 = function _loop2(event) {
               item.on(event, function () {
-                return _this3.events[event](item, _this3.getChildren().indexOf(item), _this3.getChildren());
+                return _this2.events[event](item, _this2.getChildren().indexOf(item), _this2.getChildren());
               });
             };
 
-            for (var event in _this3.events) {
+            for (var event in _this2.events) {
               _loop2(event);
             }
 
-            _get(_getPrototypeOf(ListView.prototype), "add", _this3).call(_this3, item);
+            _get(_getPrototypeOf(ListView.prototype), "add", _this2).call(_this2, item);
           };
 
           for (var _iterator4 = (Array.isArray(items) ? items : [items])[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {

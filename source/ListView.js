@@ -70,16 +70,30 @@ export default class ListView extends Phaser.GameObjects.Group {
         return this;
     }
 
-    setScrollbarEnabled (config) {
-        if (!config) {
-            return this;
-        }
-
-        const colour = GetFastValue(config, 'colour', 0xffffff);
-        const alpha = colour ? GetFastValue(config, 'alpha', 1) : 0;
-        const width = GetFastValue(config, 'width', 10);
+    setScrollbarEnabled ({
+        colour = 0xffffff,
+        alpha = colour ? 1 : 0,
+        hideWhenEmpty = false,
+        track: {
+            colour: trackColour,
+            alpha: trackAlpha = trackColour ? 1 : 0,
+        } = {},
+        width = 10,
+    } = {}) {
         const textureName = `ListViewScrollBarTex${this.id}`;
-        this.hideScrollbarWhenEmpty = GetFastValue(config, 'hideWhenEmpty', false);
+        const trackTextureName = `ListViewScrollTrackTex${this.id}`;
+        this.hideScrollbarWhenEmpty = hideWhenEmpty;
+
+        this.scene.make.graphics({ x: 0 , y: 0, add: false })
+            .fillStyle(trackColour, trackAlpha)
+            .fillRect(0, 0, width, this.height)
+            .generateTexture(trackTextureName, width, this.height);
+        const track = this.scene.add.image(0, 0, trackTextureName)
+            .setOrigin(0, 0)
+            .setPosition(this.x + this.width, this.y)
+            .setInteractive();
+
+        track.on('pointerdown', this.calculateScrollPositionFromPointer, this);
 
         this.scene.make.graphics({ x: 0, y: 0, add: false })
             .fillStyle(colour, alpha)
@@ -96,27 +110,29 @@ export default class ListView extends Phaser.GameObjects.Group {
 
         this.scene.input.setDraggable(this.scrollBar);
 
-        this.scrollBar.on('drag', (pointer, x, y) => {
-            const min = this.y;
-            const max = this.y + this.height - this.scrollBar.displayHeight;
-
-            const clampedValue = Phaser.Math.Clamp(y, min, max);
-            const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
-            const barScroll = clampedValue;
-
-            if (isNaN(scrollPerc)) {
-                return;
-            }
-
-            const cameraScroll = this.y + (this.camera._bounds.height - this.camera.height) * scrollPerc;
-
-            this.scrollBar.setY(barScroll);
-            this.camera.setScroll(0, cameraScroll);
-        });
+        this.scrollBar.on('drag', this.calculateScrollPositionFromPointer, this);
 
         this.settle();
 
         return this;
+    }
+
+    calculateScrollPositionFromPointer (_, x, y) {
+        const min = this.y;
+        const max = this.y + this.height - this.scrollBar.displayHeight;
+
+        const clampedValue = Phaser.Math.Clamp(y, min, max);
+        const scrollPerc = Phaser.Math.Clamp((clampedValue - min) / (max - min), 0, 1);
+        const barScroll = clampedValue;
+
+        if (isNaN(scrollPerc)) {
+            return;
+        }
+
+        const cameraScroll = this.y + (this.camera._bounds.height - this.camera.height) * scrollPerc;
+
+        this.scrollBar.setY(barScroll);
+        this.camera.setScroll(0, cameraScroll);
     }
 
     preUpdate () {

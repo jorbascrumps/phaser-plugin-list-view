@@ -16,7 +16,7 @@ function onItemUp (item) {
 }
 
 function create () {
-    const listItems = new Array(250)
+    const listItems = new Array(20)
         .fill()
         .map((_, i) => {
             const text = this.add.text(0, 0, `Item #${i + 1}`, {
@@ -43,6 +43,10 @@ function create () {
         .setScrollbarEnabled({
             colour: 0x6666ff,
             width: 16,
+            track: {
+                alpha: 0.15,
+                colour: 0xffffff,
+            }
         })
         .setGutter(1)
         .on('pointerover',onItemOver)
