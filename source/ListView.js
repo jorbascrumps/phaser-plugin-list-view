@@ -2,6 +2,8 @@ const GetFastValue = Phaser.Utils.Objects.GetFastValue;
 
 export default class ListView extends Phaser.GameObjects.Group {
 
+    #gutter = 0
+
     constructor ({
         id,
         context,
@@ -60,6 +62,12 @@ export default class ListView extends Phaser.GameObjects.Group {
             }
         });
         */
+    }
+
+    setGutter (val) {
+        this.#gutter = Math.max(val, 0);
+
+        return this;
     }
 
     setScrollbarEnabled (config) {
@@ -193,11 +201,16 @@ export default class ListView extends Phaser.GameObjects.Group {
 
     settle () {
         const children = this.getChildren();
+
+        if (children.length === 0) {
+            return this;
+        }
+
         let childY = this.y;
         for (const child of children) {
             child.setPosition(this.x, childY);
 
-            childY += child.getBounds().height;
+            childY += child.getBounds().height + this.#gutter;
         }
 
         return this.resizeCamera();
