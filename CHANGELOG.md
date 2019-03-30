@@ -2,7 +2,7 @@
 ### New Features
 * Added support for `ListView`  item gutters via `ListView.setGutter` (#3)
 * Added scrollbar track with support for colour and alpha (#4)
-* Added camera culling (#5)
+* Added support for camera culling via `ListView.setCullRegion` (#5)
 
 ## 1.1.0 (February 27, 2019)
 ### New Features
