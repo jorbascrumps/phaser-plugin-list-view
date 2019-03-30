@@ -343,7 +343,14 @@ var ListViewPlugin = (function () {
     }, {
       key: "preUpdate",
       value: function preUpdate() {
-        var cameras = this.scene.cameras.cameras;
+        var _this$camera$worldVie = this.camera.worldView,
+            height = _this$camera$worldVie.height,
+            width = _this$camera$worldVie.width,
+            x = _this$camera$worldVie.x,
+            y = _this$camera$worldVie.y,
+            cameras = this.scene.cameras.cameras;
+        var offset = 150;
+        var cameraRect = new Phaser.Geom.Rectangle(x, y - offset, width, height + offset * 2);
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
         var _iteratorError = undefined;
@@ -364,7 +371,8 @@ var ListViewPlugin = (function () {
                 }
 
                 camera.ignore(child);
-              }
+              } // Culling
+
             } catch (err) {
               _didIteratorError3 = true;
               _iteratorError3 = err;
@@ -378,6 +386,19 @@ var ListViewPlugin = (function () {
                   throw _iteratorError3;
                 }
               }
+            }
+
+            var _child$getBounds = child.getBounds(),
+                _x = _child$getBounds.x,
+                _y = _child$getBounds.y,
+                _width = _child$getBounds.width,
+                _height = _child$getBounds.height;
+
+            var childRect = new Phaser.Geom.Rectangle(_x, _y, _width, _height);
+            var visible = Phaser.Geom.Intersects.RectangleToRectangle(cameraRect, childRect);
+
+            if (visible !== child.visible) {
+              child.setVisible(visible);
             }
           }
         } catch (err) {

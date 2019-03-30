@@ -136,7 +136,23 @@ export default class ListView extends Phaser.GameObjects.Group {
     }
 
     preUpdate () {
-        const cameras = this.scene.cameras.cameras;
+        const {
+            camera: {
+                worldView: {
+                    height,
+                    width,
+                    x,
+                    y,
+                }
+            },
+            scene: {
+                cameras: {
+                    cameras,
+                }
+            }
+        } = this;
+        const offset = 150;
+        const cameraRect = new Phaser.Geom.Rectangle(x, y - offset, width, height + (offset * 2));
 
         for (const child of this.getChildren()) {
             for (const camera of cameras) {
@@ -145,6 +161,17 @@ export default class ListView extends Phaser.GameObjects.Group {
                 }
 
                 camera.ignore(child);
+            }
+
+            // Culling
+            const {
+                x, y, width, height,
+            } = child.getBounds();
+            const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
+            const visible = Phaser.Geom.Intersects.RectangleToRectangle(cameraRect, childRect);
+
+            if (visible !== child.visible) {
+                child.setVisible(visible);
             }
         }
 
