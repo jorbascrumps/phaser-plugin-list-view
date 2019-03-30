@@ -230,6 +230,11 @@ var ListViewPlugin = (function () {
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(ListView).call(this, context, null, {}));
 
+      _cullRegion.set(_assertThisInitialized(_this), {
+        writable: true,
+        value: null
+      });
+
       _gutter.set(_assertThisInitialized(_this), {
         writable: true,
         value: 0
@@ -276,6 +281,13 @@ var ListViewPlugin = (function () {
     }
 
     _createClass(ListView, [{
+      key: "setCullRegion",
+      value: function setCullRegion(rect) {
+        _classPrivateFieldSet(this, _cullRegion, rect);
+
+        return this;
+      }
+    }, {
       key: "setGutter",
       value: function setGutter(val) {
         _classPrivateFieldSet(this, _gutter, Math.max(val, 0));
@@ -344,74 +356,45 @@ var ListViewPlugin = (function () {
       key: "preUpdate",
       value: function preUpdate() {
         var _this$camera$worldVie = this.camera.worldView,
-            height = _this$camera$worldVie.height,
-            width = _this$camera$worldVie.width,
             x = _this$camera$worldVie.x,
             y = _this$camera$worldVie.y,
             cameras = this.scene.cameras.cameras;
-        var offset = 150;
-        var cameraRect = new Phaser.Geom.Rectangle(x, y - offset, width, height + offset * 2);
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
 
-        try {
-          for (var _iterator = this.getChildren()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var child = _step.value;
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+        if (_classPrivateFieldGet(this, _cullRegion) !== null) {
+          var cullRect = new Phaser.Geom.Rectangle(x + _classPrivateFieldGet(this, _cullRegion).x, y + _classPrivateFieldGet(this, _cullRegion).y, _classPrivateFieldGet(this, _cullRegion).width, _classPrivateFieldGet(this, _cullRegion).height);
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
 
-            try {
-              for (var _iterator3 = cameras[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                var camera = _step3.value;
+          try {
+            for (var _iterator = this.getChildren()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var child = _step.value;
 
-                if (camera.id === this.camera.id) {
-                  continue;
-                }
+              var _child$getBounds = child.getBounds(),
+                  _x = _child$getBounds.x,
+                  _y = _child$getBounds.y,
+                  width = _child$getBounds.width,
+                  height = _child$getBounds.height;
 
-                camera.ignore(child);
-              } // Culling
+              var childRect = new Phaser.Geom.Rectangle(_x, _y, width, height);
+              var visible = Phaser.Geom.Intersects.RectangleToRectangle(cullRect, childRect);
 
-            } catch (err) {
-              _didIteratorError3 = true;
-              _iteratorError3 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                  _iterator3.return();
-                }
-              } finally {
-                if (_didIteratorError3) {
-                  throw _iteratorError3;
-                }
+              if (visible !== child.visible) {
+                child.setVisible(visible);
               }
             }
-
-            var _child$getBounds = child.getBounds(),
-                _x = _child$getBounds.x,
-                _y = _child$getBounds.y,
-                _width = _child$getBounds.width,
-                _height = _child$getBounds.height;
-
-            var childRect = new Phaser.Geom.Rectangle(_x, _y, _width, _height);
-            var visible = Phaser.Geom.Intersects.RectangleToRectangle(cameraRect, childRect);
-
-            if (visible !== child.visible) {
-              child.setVisible(visible);
-            }
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
           } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
             }
           }
         }
@@ -421,14 +404,36 @@ var ListViewPlugin = (function () {
         var _iteratorError2 = undefined;
 
         try {
-          for (var _iterator2 = this.scene.sys.displayList.getAll()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          for (var _iterator2 = this.getChildren()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var _child = _step2.value;
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
 
-            if (this.contains(_child)) {
-              continue;
+            try {
+              for (var _iterator4 = cameras[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                var camera = _step4.value;
+
+                if (camera.id === this.camera.id) {
+                  continue;
+                }
+
+                camera.ignore(_child);
+              }
+            } catch (err) {
+              _didIteratorError4 = true;
+              _iteratorError4 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
+                }
+              } finally {
+                if (_didIteratorError4) {
+                  throw _iteratorError4;
+                }
+              }
             }
-
-            this.camera.ignore(_child);
           }
         } catch (err) {
           _didIteratorError2 = true;
@@ -441,6 +446,35 @@ var ListViewPlugin = (function () {
           } finally {
             if (_didIteratorError2) {
               throw _iteratorError2;
+            }
+          }
+        }
+
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
+
+        try {
+          for (var _iterator3 = this.scene.sys.displayList.getAll()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var _child2 = _step3.value;
+
+            if (this.contains(_child2)) {
+              continue;
+            }
+
+            this.camera.ignore(_child2);
+          }
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+              _iterator3.return();
+            }
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
             }
           }
         }
@@ -459,13 +493,13 @@ var ListViewPlugin = (function () {
         var _this2 = this;
 
         var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-        var _iteratorNormalCompletion4 = true;
-        var _didIteratorError4 = false;
-        var _iteratorError4 = undefined;
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
 
         try {
           var _loop = function _loop() {
-            var item = _step4.value;
+            var item = _step5.value;
 
             var listBounds = _this2.getBounds();
 
@@ -490,20 +524,20 @@ var ListViewPlugin = (function () {
             _get(_getPrototypeOf(ListView.prototype), "add", _this2).call(_this2, item);
           };
 
-          for (var _iterator4 = (Array.isArray(items) ? items : [items])[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          for (var _iterator5 = (Array.isArray(items) ? items : [items])[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
             _loop();
           }
         } catch (err) {
-          _didIteratorError4 = true;
-          _iteratorError4 = err;
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-              _iterator4.return();
+            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+              _iterator5.return();
             }
           } finally {
-            if (_didIteratorError4) {
-              throw _iteratorError4;
+            if (_didIteratorError5) {
+              throw _iteratorError5;
             }
           }
         }
@@ -536,27 +570,27 @@ var ListViewPlugin = (function () {
         }
 
         var childY = this.y;
-        var _iteratorNormalCompletion5 = true;
-        var _didIteratorError5 = false;
-        var _iteratorError5 = undefined;
+        var _iteratorNormalCompletion6 = true;
+        var _didIteratorError6 = false;
+        var _iteratorError6 = undefined;
 
         try {
-          for (var _iterator5 = children[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var child = _step5.value;
+          for (var _iterator6 = children[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+            var child = _step6.value;
             child.setPosition(this.x, childY);
             childY += child.getBounds().height + _classPrivateFieldGet(this, _gutter);
           }
         } catch (err) {
-          _didIteratorError5 = true;
-          _iteratorError5 = err;
+          _didIteratorError6 = true;
+          _iteratorError6 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-              _iterator5.return();
+            if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
+              _iterator6.return();
             }
           } finally {
-            if (_didIteratorError5) {
-              throw _iteratorError5;
+            if (_didIteratorError6) {
+              throw _iteratorError6;
             }
           }
         }
@@ -598,26 +632,26 @@ var ListViewPlugin = (function () {
       key: "getBounds",
       value: function getBounds() {
         var bounds = new Phaser.Geom.Rectangle(this.x, this.y, 0, 0);
-        var _iteratorNormalCompletion6 = true;
-        var _didIteratorError6 = false;
-        var _iteratorError6 = undefined;
+        var _iteratorNormalCompletion7 = true;
+        var _didIteratorError7 = false;
+        var _iteratorError7 = undefined;
 
         try {
-          for (var _iterator6 = this.getChildren()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-            var child = _step6.value;
+          for (var _iterator7 = this.getChildren()[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+            var child = _step7.value;
             Phaser.Geom.Rectangle.MergeRect(bounds, child.getBounds());
           }
         } catch (err) {
-          _didIteratorError6 = true;
-          _iteratorError6 = err;
+          _didIteratorError7 = true;
+          _iteratorError7 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-              _iterator6.return();
+            if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+              _iterator7.return();
             }
           } finally {
-            if (_didIteratorError6) {
-              throw _iteratorError6;
+            if (_didIteratorError7) {
+              throw _iteratorError7;
             }
           }
         }
@@ -628,6 +662,8 @@ var ListViewPlugin = (function () {
 
     return ListView;
   }(Phaser.GameObjects.Group);
+
+  var _cullRegion = new WeakMap();
 
   var _gutter = new WeakMap();
 

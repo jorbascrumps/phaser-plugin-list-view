@@ -2,6 +2,8 @@ const GetFastValue = Phaser.Utils.Objects.GetFastValue;
 
 export default class ListView extends Phaser.GameObjects.Group {
 
+    #cullRegion = null
+
     #gutter = 0
 
     constructor ({
@@ -62,6 +64,12 @@ export default class ListView extends Phaser.GameObjects.Group {
             }
         });
         */
+    }
+
+    setCullRegion (rect) {
+        this.#cullRegion = rect;
+
+        return this;
     }
 
     setGutter (val) {
@@ -139,8 +147,6 @@ export default class ListView extends Phaser.GameObjects.Group {
         const {
             camera: {
                 worldView: {
-                    height,
-                    width,
                     x,
                     y,
                 }
@@ -151,8 +157,27 @@ export default class ListView extends Phaser.GameObjects.Group {
                 }
             }
         } = this;
-        const offset = 150;
-        const cameraRect = new Phaser.Geom.Rectangle(x, y - offset, width, height + (offset * 2));
+
+        if (this.#cullRegion !== null) {
+            const cullRect = new Phaser.Geom.Rectangle(
+                x + this.#cullRegion.x,
+                y + this.#cullRegion.y,
+                this.#cullRegion.width,
+                this.#cullRegion.height
+            );
+
+            for (const child of this.getChildren()) {
+                const {
+                    x, y, width, height,
+                } = child.getBounds();
+                const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
+                const visible = Phaser.Geom.Intersects.RectangleToRectangle(cullRect, childRect);
+
+                if (visible !== child.visible) {
+                    child.setVisible(visible);
+                }
+            }
+        }
 
         for (const child of this.getChildren()) {
             for (const camera of cameras) {
@@ -161,17 +186,6 @@ export default class ListView extends Phaser.GameObjects.Group {
                 }
 
                 camera.ignore(child);
-            }
-
-            // Culling
-            const {
-                x, y, width, height,
-            } = child.getBounds();
-            const childRect = new Phaser.Geom.Rectangle(x, y, width, height);
-            const visible = Phaser.Geom.Intersects.RectangleToRectangle(cameraRect, childRect);
-
-            if (visible !== child.visible) {
-                child.setVisible(visible);
             }
         }
 
