@@ -48,6 +48,7 @@ function create () {
                 colour: 0xffffff,
             }
         })
+        .setCullRegion(new Phaser.Geom.Rectangle(0, -50, 1, 500))
         .setGutter(1)
         .on('pointerover',onItemOver)
         .on('pointerout', onItemOut)
